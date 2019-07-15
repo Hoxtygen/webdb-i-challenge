@@ -41,7 +41,6 @@ function getAllAccounts() {
   server.get('/accounts/:id', async(req, res, next) => {
     try {
         const account = await getAccountById(req.params.id);
-        console.log(account)
         if (!account.length) {
             return res.status(404).json({
                 errorMessage: 'The account with the specified ID does not exist'
@@ -111,14 +110,12 @@ server.post('/accounts', async(req, res, next) => {
     }
     try {
         const [budget] = await getAccountById(id);
-        //console.log(budget)
         if (!budget) {
             return res.status(404).json({
                 errorMessage: "The user with the specified ID does not exist."
             })
         }
         req.budget = budget;
-        console.log(req.budget)
     } catch (error) {
         return res.status(500).json({
             error
