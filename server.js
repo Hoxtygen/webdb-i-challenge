@@ -20,7 +20,9 @@ function getAllAccounts() {
     return db('accounts').insert({ name, budget });
   }
 
-
+  function deleteAccountById(id) {
+    return db('accounts').where({ id }).del();
+  }
 
 
 
@@ -36,7 +38,6 @@ function getAllAccounts() {
   server.get('/accounts/:id', async(req, res, next) => {
     try {
         const account = await getAccountById(req.params.id);
-        //console.log(account)
         if (!account.length) {
             return res.status(404).json({
                 errorMessage: 'The account with the specified ID does not exist'
@@ -60,6 +61,24 @@ server.post('/accounts', async(req, res, next) => {
             errorMessage: error,
         })
     }
+  });
+
+  server.delete('/accounts/:id', async(req, res, next) => {
+      try {
+          const budget = await deleteAccountById(req.params.id);
+          if (!budget) {
+            return res.status(404).json({
+                errorMessage: 'The account with the specified ID does not exist'
+            })
+          }
+          return res.status(200).json({
+              message: 'Budget successfully deleted'
+          })
+      } catch (error) {
+        return res.status(500).json({
+            errorMessage: error,
+        })
+      }
   })
 
 module.exports = server;
