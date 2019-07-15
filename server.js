@@ -11,7 +11,10 @@ function getAllAccounts() {
     return db('accounts');
   }
 
-  
+  function getAccountById(id) {
+    // SELECT * FROM users WHERE id = id;
+    return db('accounts').where({ id });
+  }
 
 
 
@@ -28,6 +31,21 @@ function getAllAccounts() {
       return res.json(accounts);
   });
 
- 
+  server.get('/accounts/:id', async(req, res, next) => {
+    try {
+        const account = await getAccountById(req.params.id);
+        //console.log(account)
+        if (!account.length) {
+            return res.status(404).json({
+                errorMessage: 'The account with the specified ID does not exist'
+            })
+        }
+        return res.status(200).json(account[0])
+    } catch (error) {
+      return res.status(500).json({
+          errorMessage: error,
+      })
+    }
+})
 
 module.exports = server;
