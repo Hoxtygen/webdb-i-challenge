@@ -92,7 +92,7 @@ server.post('/accounts', async(req, res, next) => {
       try {
         const updatedBudget = await updateAccountById(req.budget.id, budgetUpdates);
         const [ updatedBudgetData ] = await getAccountById(req.budget.id);
-        res.status(200).json(updatedBudgetData)
+        return res.status(200).json(updatedBudgetData)
         return res.status(200).json(updatedBudget)
       } catch (error) {
         return res.status(500).json({
