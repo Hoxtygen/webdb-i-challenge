@@ -12,7 +12,6 @@ function getAllAccounts() {
   }
 
   function getAccountById(id) {
-    // SELECT * FROM users WHERE id = id;
     return db('accounts').where({ id });
   }
 
@@ -22,6 +21,10 @@ function getAllAccounts() {
 
   function deleteAccountById(id) {
     return db('accounts').where({ id }).del();
+  }
+
+  function updateAccountById(id, { name, budget }) {
+    return db('accounts').where({ id }).update({ name, budget });
   }
 
 
@@ -38,6 +41,7 @@ function getAllAccounts() {
   server.get('/accounts/:id', async(req, res, next) => {
     try {
         const account = await getAccountById(req.params.id);
+        console.log(account)
         if (!account.length) {
             return res.status(404).json({
                 errorMessage: 'The account with the specified ID does not exist'
@@ -77,8 +81,51 @@ server.post('/accounts', async(req, res, next) => {
       } catch (error) {
         return res.status(500).json({
             errorMessage: error,
-        })
+        });
+      }
+  });
+
+  server.put('/accounts/:id', validatebudgetId, async(req, res, next) => {
+    const budgetUpdates = { 
+        name: req.body.name,
+        budget: req.body.budget
+     } 
+      try {
+        const updatedBudget = await updateAccountById(req.budget.id, budgetUpdates);
+        const [ updatedBudgetData ] = await getAccountById(req.budget.id);
+        res.status(200).json(updatedBudgetData)
+        return res.status(200).json(updatedBudget)
+      } catch (error) {
+        return res.status(500).json({
+            errorMessage: error,
+        });
       }
   })
 
+  async function validatebudgetId(req, res, next) {
+    const id = req.params.id;
+    if (Number.isNaN(id) || id % 1 !== 0 || id < 0) {
+        return res.status(400).json({
+            errorMessage: "Invalid budget id supplied"
+        });
+    }
+    try {
+        const [budget] = await getAccountById(id);
+        //console.log(budget)
+        if (!budget) {
+            return res.status(404).json({
+                errorMessage: "The user with the specified ID does not exist."
+            })
+        }
+        req.budget = budget;
+        console.log(req.budget)
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+    return next();
+};
+
 module.exports = server;
+
