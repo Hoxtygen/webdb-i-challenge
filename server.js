@@ -84,7 +84,7 @@ server.post('/accounts', async(req, res, next) => {
       }
   });
 
-  server.put('/accounts/:id', validatebudgetId, async(req, res, next) => {
+  server.put('/accounts/:id', validatebudgetId, validateBudgetBody, async(req, res, next) => {
     const budgetUpdates = { 
         name: req.body.name,
         budget: req.body.budget
@@ -122,6 +122,20 @@ server.post('/accounts', async(req, res, next) => {
         })
     }
     return next();
+};
+
+function validateBudgetBody(req, res, next) {
+    if (!Object.keys(req.body).length) {
+        return res.status(400).send({
+          message: 'missing budget data',
+        });
+      }
+      if (!req.body.name || !req.body.budget) {
+        return res.status(400).send({
+          message: 'missing required name and budget field',
+        });
+      }
+      return next()
 };
 
 module.exports = server;
