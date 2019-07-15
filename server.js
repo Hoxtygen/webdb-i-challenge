@@ -16,7 +16,9 @@ function getAllAccounts() {
     return db('accounts').where({ id });
   }
 
-
+  function createNewAccount({ name, budget }) {
+    return db('accounts').insert({ name, budget });
+  }
 
 
 
@@ -47,5 +49,17 @@ function getAllAccounts() {
       })
     }
 })
+
+server.post('/accounts', async(req, res, next) => {
+    try {
+        const newBudget = await createNewAccount(req.body)
+        const newBudgetData = await getAccountById(newBudget[0]);
+        return res.json(newBudgetData)
+    } catch (error) {
+        return res.status(500).json({
+            errorMessage: error,
+        })
+    }
+  })
 
 module.exports = server;
